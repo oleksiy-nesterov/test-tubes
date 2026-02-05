@@ -210,18 +210,23 @@
 
     /* experiment */
     html {
-      height: 100%;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
     }
     body {
-      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       user-select: none;
       flex-direction: row;
       gap: 40px;
-      background-color: black;
       flex-wrap: wrap;
+      background-color: black;
+      margin: 80px 0;
     }
     body > div {
       min-width: 60px;
@@ -354,7 +359,7 @@
   const createLevel = (count = 4, emptyCount = 2) => {
     document.body.innerHTML = '';
     const reset = document.createElement('span');
-    reset.onclick = () => createLevel(5);
+    reset.onclick = () => createLevel(count, emptyCount);
 
     const elements = [];
     for (let i = 0; i < emptyCount; i++) {
@@ -367,6 +372,6 @@
     document.body.append(...elements.sort(() => Math.random() - 0.5), reset);
   }
 
-  createLevel(5);
+  createLevel(8);
 </script>
 </html>
