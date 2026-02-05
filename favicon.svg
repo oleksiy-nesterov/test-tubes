@@ -1,19 +1,19 @@
 <svg viewBox="-25.6 -25.6 563.20 563.20" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="linearGradient1">
-      <stop style="stop-color:#ff0060;stop-opacity:1;" offset="0"/>
-      <stop style="stop-color:#990044;stop-opacity:1;" offset="1"/>
+      <stop style="stop-color:#ff0060;" offset="0"/>
+      <stop style="stop-color:#990044;" offset="1"/>
     </linearGradient>
     <linearGradient id="linearGradient2">
-      <stop style="stop-color:#00dfa2;stop-opacity:1;" offset="0"/>
-      <stop style="stop-color:#00996a;stop-opacity:1;" offset="1"/>
+      <stop style="stop-color:#00dfa2;" offset="0"/>
+      <stop style="stop-color:#00996a;" offset="1"/>
     </linearGradient>
     <linearGradient id="linearGradient3">
-      <stop style="stop-color:#0079ff;stop-opacity:1;" offset="0"/>
-      <stop style="stop-color:#004999;stop-opacity:1;" offset="1"/>
+      <stop style="stop-color:#0079ff;" offset="0"/>
+      <stop style="stop-color:#004999;" offset="1"/>
     </linearGradient>
   </defs>
-  <!-- <rect fill="#000000" width="563.20001" height="563.20001" x="-25.6" y="-25.6"/> -->
+  <!--  <rect fill="#000000" width="563.20001" height="563.20001" x="-25.6" y="-25.6"/>-->
   <rect fill="#212121" x="288.74924" y="131.22719" width="130.99701" height="172.76236" />
   <rect fill="#212121" x="92.253746" y="73.639725" width="130.99701" height="115.17491"/>
   <path fill="url(#linearGradient1)" d="m 354.24775,438.36027 c -36.11884,0 -65.4985,-25.83112 -65.4985,-57.58745 v -76.78327 h 130.99701 v 76.78327 c 0,31.75633 -29.37966,57.58745 -65.49851,57.58745 z"/>
