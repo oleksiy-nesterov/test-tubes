@@ -61,7 +61,7 @@
       position: relative;
       display: inline-block;
       cursor: pointer;
-      transition: transform 0.2s ease-in-out;
+      transition: transform 0.1s ease-in-out;
       transform: translate(0, 0);
     }
 
@@ -133,7 +133,6 @@
     }
 
     .tube.pour {
-      position: relative;
       z-index: 1;
       transform: translate(calc(var(--x) + 50%), calc(var(--y) - 20%));
       animation-duration: var(--duration);
@@ -414,6 +413,8 @@
   }
 
   createGame = (levels) => {
+    lock = false;
+    selectedTube = null;
     document.body.innerHTML = '';
     const reset = document.createElement('span');
     reset.onclick = () => createGame(levels);
