@@ -61,7 +61,7 @@
       position: relative;
       display: inline-block;
       cursor: pointer;
-      transition: transform 0.1s ease-in-out;
+      transition: transform 0.2s ease-in-out;
       transform: translate(0, 0);
     }
 
@@ -275,6 +275,7 @@
   const PALETTE = ['#0079FF', '#F6FA70', '#00DFA2', '#FF0060', '#9929EA'];
 
   let selectedTube = null;
+  let lock;
 
   const tubeElSetup = (el) => {
     const setProperties = (element, list) => {
@@ -322,11 +323,14 @@
 
     el.addEventListener('animationend', (e) => {
       if (e.animationName !== 'interpolation') return;
+      lock = false;
       el.classList.remove('pour');
       unselect();
     });
 
     el.onclick = () => {
+      if (lock) return;
+
       if (selectedTube === el) {
         unselect();
         return;
@@ -366,9 +370,9 @@
         ['--ff', fill],
       ])
 
+      lock = true;
       selectedTube.classList.add('pour');
       play(selectedTube, 'interpolation');
-      selectedTube.style.animationName = 'none';
 
       setProperties(el, [
         ['--f', fill + DELTA * i],
