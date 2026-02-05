@@ -11,7 +11,6 @@
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="robots" content="index, follow"/>
   <meta name="theme-color" content="#000000"/>
   <meta name="author" content="Oleksiy Nesterov"/>
   <meta name="publisher" content="Oleksiy Nesterov"/>
@@ -48,9 +47,9 @@
       --c3: transparent;
       --c4: transparent;
       --f: 0;
+      --ff: 0;
       --x: 0;
       --y: 0;
-
       --glass-rgb: 200, 200, 255;
       --duration: 1s;
       --top: 20px;
@@ -62,6 +61,8 @@
       position: relative;
       display: inline-block;
       cursor: pointer;
+      transition: transform 0.1s ease-in-out;
+      transform: translate(0, 0);
     }
 
     .tube > div {
@@ -132,13 +133,11 @@
     }
 
     .tube.pour {
+      position: relative;
+      z-index: 1;
+      transform: translate(calc(var(--x) + 50%), calc(var(--y) - 20%));
       animation-duration: var(--duration);
       animation-timing-function: ease-in-out;
-      position: absolute;
-      z-index: 1;
-      left: var(--x);
-      top: var(--y);
-      transform: translate(50%, -25%);
     }
 
     .tube.pour > div {
@@ -148,24 +147,25 @@
 
     .tube.pour:before {
       --drop-width: calc(var(--width) / 20);
+      --fill-delta: calc(75% * var(--ff));
       content: "";
       position: absolute;
-      height: calc(100% * var(--v0));
-      bottom: calc(100% * (1 - var(--v1)));
+      height: calc((100% - var(--fill-delta)) * var(--v0));
+      bottom: calc(var(--fill-delta) + (100% - var(--fill-delta)) * (1 - var(--v1)));
       left: 0;
       width: var(--drop-width);
       border-radius: calc(var(--drop-width) * 0.5);
       transform-origin: 50% 0;
       background: linear-gradient(
-          to right,
-          var(--c1) 0%,
-          var(--c1) 25%,
-          var(--c2) 25%,
-          var(--c2) 50%,
-          var(--c3) 50%,
-          var(--c3) 75%,
-          var(--c4) 75%,
-          var(--c4) 100%
+        to right,
+        var(--c1) 0%,
+        var(--c1) 25%,
+        var(--c2) 25%,
+        var(--c2) 50%,
+        var(--c3) 50%,
+        var(--c3) 75%,
+        var(--c4) 75%,
+        var(--c4) 100%
       );
       background-repeat: no-repeat;
       background-size: calc(var(--drop-width) * 4) 100%;
@@ -228,9 +228,6 @@
       background-color: black;
       margin: 80px 0;
     }
-    body > div {
-      min-width: 60px;
-    }
     body > span {
       position: absolute;
       right: 20px;
@@ -285,12 +282,6 @@
       selectedTube = null;
     }
 
-    el.addEventListener('animationend', (e) => {
-      if (e.animationName !== 'interpolation') return;
-      el.classList.remove('pour');
-      unselect();
-    });
-
     el.onclick = () => {
       if (selectedTube === el) {
         unselect();
@@ -315,11 +306,20 @@
       }
 
       const rect = el.getBoundingClientRect();
+      const selectedRect = selectedTube.getBoundingClientRect();
       setProperties(selectedTube, [
-        ['--x', `${rect.left}px`],
-        ['--y', `${rect.top}px`],
-        ['--f', selectedTubeFill - DELTA * i]
+        ['--x', `${rect.left - selectedRect.left}px`],
+        ['--y', `${rect.top - selectedRect.top}px`],
+        ['--f', selectedTubeFill - DELTA * i],
+        ['--ff', fill],
       ])
+
+      selectedTube.addEventListener('animationend', (e) => {
+        if (e.animationName !== 'interpolation') return;
+        selectedTube.classList.remove('pour');
+        unselect();
+      }, {once: true});
+
       selectedTube.classList.add('pour');
       selectedTube.style.animationName = 'none';
       requestAnimationFrame(() => {
