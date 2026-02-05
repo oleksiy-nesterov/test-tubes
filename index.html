@@ -282,6 +282,12 @@
       selectedTube = null;
     }
 
+    el.addEventListener('animationend', (e) => {
+      if (e.animationName !== 'interpolation') return;
+      el.classList.remove('pour');
+      unselect();
+    });
+
     el.onclick = () => {
       if (selectedTube === el) {
         unselect();
@@ -313,12 +319,6 @@
         ['--f', selectedTubeFill - DELTA * i],
         ['--ff', fill],
       ])
-
-      selectedTube.addEventListener('animationend', (e) => {
-        if (e.animationName !== 'interpolation') return;
-        selectedTube.classList.remove('pour');
-        unselect();
-      }, {once: true});
 
       selectedTube.classList.add('pour');
       selectedTube.style.animationName = 'none';
