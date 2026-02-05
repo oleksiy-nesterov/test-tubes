@@ -41,21 +41,6 @@
   <title>Test Tubes Puzzle</title>
 
   <style>
-    html {
-      height: 100%;
-    }
-
-    body {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      flex-direction: row;
-      gap: 40px;
-      background-color: black;
-    }
-
     /* tube */
     .tube {
       --c1: transparent;
@@ -63,6 +48,8 @@
       --c3: transparent;
       --c4: transparent;
       --f: 0;
+      --x: 0;
+      --y: 0;
 
       --glass-rgb: 200, 200, 255;
       --duration: 1s;
@@ -147,6 +134,11 @@
     .tube.pour {
       animation-duration: var(--duration);
       animation-timing-function: ease-in-out;
+      position: absolute;
+      z-index: 1;
+      left: var(--x);
+      top: var(--y);
+      transform: translate(50%, -25%);
     }
 
     .tube.pour > div {
@@ -217,132 +209,164 @@
     }
 
     /* experiment */
+    html {
+      height: 100%;
+    }
+    body {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      flex-direction: row;
+      gap: 40px;
+      background-color: black;
+      flex-wrap: wrap;
+    }
     body > div {
       min-width: 60px;
     }
-
+    body > span {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      color: white;
+      font-family: sans-serif;
+      cursor: pointer;
+    }
+    body > span:before {
+      content: "Reset Level";
+    }
     .selected {
       --glass-rgb: 255, 255, 255;
       transform: scale(1.1);
     }
-
-    .tube.pour {
-      position: absolute;
-      z-index: 1;
-      left: var(--x);
-      top: var(--y);
-      transform: translate(50%, -25%);
-    }
   </style>
 </head>
 <body>
-<div>
-  <div class="tube">
-    <div>
-    </div>
-  </div>
-</div>
-
-<div>
-  <div class="tube">
-    <div>
-    </div>
-  </div>
-</div>
-
-<div>
-  <div class="tube" style="--c1:#0079FF; --c2:#F6FA70; --c3:#00DFA2; --c4:#FF0060; --f:1">
-    <div>
-    </div>
-  </div>
-</div>
-
-<div>
-  <div class="tube" style="--c1:#0079FF; --c2:#00DFA2; --c3:#F6FA70; --c4:#FF0060; --f:1">
-    <div>
-    </div>
-  </div>
-</div>
-
-<div>
-  <div class="tube" style="--c1:#FF0060; --c2:#00DFA2; --c3:#00DFA2; --c4:#FF0060; --f:1">
-    <div>
-    </div>
-  </div>
-</div>
-
-<div>
-  <div class="tube" style="--c1:#0079FF; --c2:#0079FF; --c3:#F6FA70; --c4:#F6FA70; --f:1">
-    <div>
-    </div>
-  </div>
-</div>
 </body>
 <script>
-  const map0 = {1: '--c1', 0.75: '--c2', 0.5: '--c3', 0.25: '--c4'};
-  const map1 = {0: '--c4', 0.25: '--c3', 0.5: '--c2', 0.75: '--c1'};
-  const map2 = {0.25: '--c4', 0.5: '--c3', 0.75: '--c2'};
+  const CAPACITY = 4;
+  const DELTA = 1 / CAPACITY;
+  const PALETTE = ['#0079FF', '#F6FA70', '#00DFA2', '#FF0060'];
 
-  let selected = null;
-  document.querySelectorAll('.tube').forEach((tube, i) => {
-    tube.addEventListener('animationend', (e) => {
+  let selectedTube = null;
+
+  const tubeElSetup = (el) => {
+    const setProperties = (element, list) => {
+      list.forEach(([key, value]) => {
+        element.style.setProperty(key, value);
+      });
+    }
+
+    const getVarByFill = (fill, correction = 0) => {
+      const n = CAPACITY + correction - fill / DELTA;
+      if (n < 1 || n > CAPACITY) return
+      return `--c${n}`
+    }
+
+    const getColorByFill = (element, fill) => {
+      return element.style.getPropertyValue(getVarByFill(fill, 1));
+    }
+
+    const select = () => {
+      selectedTube = el;
+      selectedTube.classList.add('selected');
+    }
+
+    const unselect = () => {
+      if (!selectedTube) return;
+      selectedTube.classList.remove('selected');
+      selectedTube = null;
+    }
+
+    el.addEventListener('animationend', (e) => {
       if (e.animationName !== 'interpolation') return;
-      tube.classList.remove('pour');
-      if (selected) {
-        selected.classList.remove('selected');
-        selected = null;
-      }
+      el.classList.remove('pour');
+      unselect();
     });
 
-    tube.onclick = () => {
-      if (selected === tube) {
-        selected.classList.remove('selected');
-        selected = null;
+    el.onclick = () => {
+      if (selectedTube === el) {
+        unselect();
         return;
       }
 
-      const f = parseFloat(tube.style.getPropertyValue('--f') || 0);
-      if (!selected) {
-        if (f > 0) {
-          selected = tube;
-          selected.classList.add('selected');
-        }
+      const fill = parseFloat(el.style.getPropertyValue('--f') || 0);
+      if (!selectedTube) {
+        fill > 0 && select();
         return;
       }
+      if (fill === 1) return;
 
-      const fs = parseFloat(selected.style.getPropertyValue('--f') || 0);
-      if (f === 1 || fs === 0) {
-        return;
-      }
+      const selectedTubeFill = parseFloat(selectedTube.style.getPropertyValue('--f') || 0);
+      if (selectedTubeFill === 0) return;
 
       let i = 1;
-      const d = 0.25;
-      const c = selected.style.getPropertyValue(map0[fs]) || 'transparent';
-      while (d * i < 1 && c === selected.style.getPropertyValue(map0[fs - d * i])) {
-        i++;
-      }
-      if ((f !== 0 && c !== tube.style.getPropertyValue(map2[f])) || f + d * i > 1) {
+      const selectedTubeColor = getColorByFill(selectedTube, selectedTubeFill);
+      while (DELTA * i < 1 && selectedTubeColor && selectedTubeColor === getColorByFill(selectedTube, selectedTubeFill - DELTA * i)) i++;
+      if (fill + DELTA * i > 1 || (fill > 0 && selectedTubeColor !== getColorByFill(el, fill))) {
         return;
       }
 
-      const r = tube.getBoundingClientRect();
-      selected.style.setProperty('--x', `${r.left}px`);
-      selected.style.setProperty('--y', `${r.top}px`);
-      selected.style.setProperty('--f', fs - d * i);
-      selected.classList.add('pour');
-      selected.style.animationName = 'none';
+      const rect = el.getBoundingClientRect();
+      setProperties(selectedTube, [
+        ['--x', `${rect.left}px`],
+        ['--y', `${rect.top}px`],
+        ['--f', selectedTubeFill - DELTA * i]
+      ])
+      selectedTube.classList.add('pour');
+      selectedTube.style.animationName = 'none';
       requestAnimationFrame(() => {
-        selected.style.animationName = 'interpolation';
-        if (fs - d * i === 0) {
-          selected.classList.remove('selected');
-          selected = null;
+        selectedTube.style.animationName = 'interpolation';
+        if (selectedTubeFill - DELTA * i === 0) {
+          unselect();
         }
       });
-      for (let n = 0; n < i; n++) {
-        tube.style.setProperty(map1[f + d * n], c);
-      }
-      tube.style.setProperty('--f', f + d * i);
+
+      setProperties(el, [
+          ['--f', fill + DELTA * i],
+          ...Array(i).fill(0).map((_, n) => [getVarByFill(fill + DELTA * n), selectedTubeColor]),
+      ]);
     };
-  });
+  }
+
+  const tubeElSetVars = (el, tube = []) => {
+    const fill = tube.filter(Boolean).length / CAPACITY;
+    el.style.setProperty('--f', fill);
+    [...tube].reverse().forEach((color, i) => {
+      if (!color) return
+      el.style.setProperty(`--c${CAPACITY - i}`, color);
+    });
+  }
+
+  const tubeElCreate = (tube = []) => {
+    const el = document.createElement('div');
+    el.className = 'tube';
+    tubeElSetVars(el, tube);
+    tubeElSetup(el);
+    el.appendChild(document.createElement('div'));
+    const wrapper = document.createElement('div')
+    wrapper.appendChild(el);
+    return wrapper;
+  }
+
+  const createLevel = (count = 4, emptyCount = 2) => {
+    document.body.innerHTML = '';
+    const reset = document.createElement('span');
+    reset.onclick = () => createLevel(5);
+
+    const elements = [];
+    for (let i = 0; i < emptyCount; i++) {
+      elements.push(tubeElCreate());
+    }
+    for (let i = 0; i < count; i++) {
+      const tube = PALETTE.slice(0, CAPACITY).sort(() => Math.random() - 0.5);
+      elements.push(tubeElCreate(tube))
+    }
+    document.body.append(...elements.sort(() => Math.random() - 0.5), reset);
+  }
+
+  createLevel(5);
 </script>
 </html>

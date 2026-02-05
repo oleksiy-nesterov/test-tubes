@@ -7,6 +7,8 @@
 A lightweight, logic-based puzzle game where the goal is to sort colored liquids into their respective test tubes.
 Built entirely with **Pure JavaScript** and **CSS**, demonstrating high performance and zero-dependency architecture.
 
+https://oleksiy-nesterov.github.io/test-tubes/
+
 ## Technical Highlights
 * **Zero Frameworks:** No React, Vue, or jQuery. Built using native Web APIs.
 * **CSS Animations:** Smooth pouring effects and transitions handled via CSS `transform` and `transition` properties.
