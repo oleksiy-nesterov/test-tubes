@@ -157,15 +157,15 @@
       border-radius: calc(var(--drop-width) * 0.5);
       transform-origin: 50% 0;
       background: linear-gradient(
-        to right,
-        var(--c1) 0%,
-        var(--c1) 25%,
-        var(--c2) 25%,
-        var(--c2) 50%,
-        var(--c3) 50%,
-        var(--c3) 75%,
-        var(--c4) 75%,
-        var(--c4) 100%
+          to right,
+          var(--c1) 0%,
+          var(--c1) 25%,
+          var(--c2) 25%,
+          var(--c2) 50%,
+          var(--c3) 50%,
+          var(--c3) 75%,
+          var(--c4) 75%,
+          var(--c4) 100%
       );
       background-repeat: no-repeat;
       background-size: calc(var(--drop-width) * 4) 100%;
@@ -208,6 +208,24 @@
       }
     }
 
+    @keyframes shaking {
+      0% {
+        transform: rotate(0deg);
+      }
+      25% {
+        transform: rotate(5deg);
+      }
+      50% {
+        transform: rotate(0eg);
+      }
+      75% {
+        transform: rotate(-5deg);
+      }
+      100% {
+        transform: rotate(0deg);
+      }
+    }
+
     /* experiment */
     html {
       min-height: 100svh;
@@ -217,6 +235,7 @@
       align-items: center;
       background-color: black;
     }
+
     body {
       display: flex;
       align-items: center;
@@ -228,6 +247,7 @@
       background-color: black;
       margin: 80px 0;
     }
+
     body > span {
       position: absolute;
       right: 20px;
@@ -236,9 +256,11 @@
       font-family: sans-serif;
       cursor: pointer;
     }
+
     body > span:before {
       content: "Reset Level";
     }
+
     .selected {
       --glass-rgb: 255, 255, 255;
       transform: scale(1.1);
@@ -250,7 +272,7 @@
 <script>
   const CAPACITY = 4;
   const DELTA = 1 / CAPACITY;
-  const PALETTE = ['#0079FF', '#F6FA70', '#00DFA2', '#FF0060'];
+  const PALETTE = ['#0079FF', '#F6FA70', '#00DFA2', '#FF0060', '#9929EA'];
 
   let selectedTube = null;
 
@@ -259,28 +281,44 @@
       list.forEach(([key, value]) => {
         element.style.setProperty(key, value);
       });
-    }
+    };
 
-    const getVarByFill = (fill, correction = 0) => {
+    const getColorVarByFill = (fill, correction = 0) => {
       const n = CAPACITY + correction - fill / DELTA;
       if (n < 1 || n > CAPACITY) return
       return `--c${n}`
-    }
+    };
 
     const getColorByFill = (element, fill) => {
-      return element.style.getPropertyValue(getVarByFill(fill, 1));
-    }
+      return element.style.getPropertyValue(getColorVarByFill(fill, 1));
+    };
+
+    const isDone = (element) => {
+      const fill = parseFloat(el.style.getPropertyValue('--f') || 0);
+      if (fill !== 1) return false;
+      const colors = Array(CAPACITY).fill(0).map((_, i) => getColorByFill(element, DELTA + DELTA * i)).filter(Boolean);
+      return colors.length === CAPACITY && new Set(colors).size === 1
+    };
 
     const select = () => {
       selectedTube = el;
       selectedTube.classList.add('selected');
-    }
+    };
 
     const unselect = () => {
       if (!selectedTube) return;
       selectedTube.classList.remove('selected');
       selectedTube = null;
-    }
+    };
+
+    const play = (element, animation, duration, timing) => {
+      element.style.animationName = 'none';
+      element.style.animationDuration = duration ?? '';
+      element.style.animationTimingFunction = timing ?? '';
+      requestAnimationFrame(() => {
+        element.style.animationName = animation;
+      });
+    };
 
     el.addEventListener('animationend', (e) => {
       if (e.animationName !== 'interpolation') return;
@@ -296,10 +334,17 @@
 
       const fill = parseFloat(el.style.getPropertyValue('--f') || 0);
       if (!selectedTube) {
-        fill > 0 && select();
+        if (fill > 0 && !isDone(el)) {
+          select();
+        } else {
+          play(el, 'shaking', '0.2s');
+        }
         return;
       }
-      if (fill === 1) return;
+      if (fill === 1) {
+        play(el, 'shaking', '0.2s');
+        return;
+      }
 
       const selectedTubeFill = parseFloat(selectedTube.style.getPropertyValue('--f') || 0);
       if (selectedTubeFill === 0) return;
@@ -308,6 +353,7 @@
       const selectedTubeColor = getColorByFill(selectedTube, selectedTubeFill);
       while (DELTA * i < 1 && selectedTubeColor && selectedTubeColor === getColorByFill(selectedTube, selectedTubeFill - DELTA * i)) i++;
       if (fill + DELTA * i > 1 || (fill > 0 && selectedTubeColor !== getColorByFill(el, fill))) {
+        play(el, 'shaking', '0.2s');
         return;
       }
 
@@ -321,17 +367,12 @@
       ])
 
       selectedTube.classList.add('pour');
+      play(selectedTube, 'interpolation');
       selectedTube.style.animationName = 'none';
-      requestAnimationFrame(() => {
-        selectedTube.style.animationName = 'interpolation';
-        if (selectedTubeFill - DELTA * i === 0) {
-          unselect();
-        }
-      });
 
       setProperties(el, [
-          ['--f', fill + DELTA * i],
-          ...Array(i).fill(0).map((_, n) => [getVarByFill(fill + DELTA * n), selectedTubeColor]),
+        ['--f', fill + DELTA * i],
+        ...Array(i).fill(0).map((_, n) => [getColorVarByFill(fill + DELTA * n), selectedTubeColor]),
       ]);
     };
   }
@@ -356,22 +397,25 @@
     return wrapper;
   }
 
-  const createLevel = (count = 4, emptyCount = 2) => {
-    document.body.innerHTML = '';
-    const reset = document.createElement('span');
-    reset.onclick = () => createLevel(count, emptyCount);
-
+  const createLevel = (count = 4, emptyCount = 2, palette = PALETTE) => {
     const elements = [];
     for (let i = 0; i < emptyCount; i++) {
       elements.push(tubeElCreate());
     }
     for (let i = 0; i < count; i++) {
-      const tube = PALETTE.slice(0, CAPACITY).sort(() => Math.random() - 0.5);
+      const tube = palette.slice(0, CAPACITY).sort(() => Math.random() - 0.5);
       elements.push(tubeElCreate(tube))
     }
-    document.body.append(...elements.sort(() => Math.random() - 0.5), reset);
+    return elements.sort(() => Math.random() - 0.5);
   }
 
-  createLevel(8);
+  createGame = (levels) => {
+    document.body.innerHTML = '';
+    const reset = document.createElement('span');
+    reset.onclick = () => createGame(levels);
+    document.body.append(...levels.map((level) => createLevel(...level)).flat(), reset)
+  }
+
+  createGame([[4, 1], [4, 1, PALETTE.slice(-4)]]);
 </script>
 </html>
