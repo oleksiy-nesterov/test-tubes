@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en" class="dark">
 <head>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-    <link rel="mask-icon" href="/favicon.svg" color="#000000"/>
-    <link rel="manifest" href="/manifest.json"/>
-    <link rel="apple-touch-icon" sizes="1024x1024" href="/1024.png"/>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+    <link rel="mask-icon" href="favicon.svg" color="#000000"/>
+    <link rel="manifest" href="manifest.json"/>
+    <link rel="apple-touch-icon" sizes="1024x1024" href="1024.png"/>
 
     <meta charset="UTF-8"/>
     <meta http-equiv="Content-Language" content="en">
@@ -22,22 +22,325 @@
 
     <!-- Open Graph (Facebook, LinkedIn, Instagram) -->
     <meta property="og:title" content="Test Tubes Puzzle"/>
-    <meta property="og:description" content="Pure JS Edition A classic liquid sorting puzzle built with zero dependencies. This project demonstrates the power of Vanilla JavaScript and CSS Flexbox/Transitions to create smooth, interactive gameplay and logic without the overhead of frameworks. Simple, fast, and lightweight."/>
+    <meta property="og:description"
+          content="Pure JS Edition A classic liquid sorting puzzle built with zero dependencies. This project demonstrates the power of Vanilla JavaScript and CSS Flexbox/Transitions to create smooth, interactive gameplay and logic without the overhead of frameworks. Simple, fast, and lightweight."/>
     <meta property="og:type" content="website"/>
-    <meta property="og:url" content="https://..."/>
+    <meta property="og:url" content="https://oleksiy-nesterov.github.io/test-tubes"/>
     <meta property="og:locale" content="en_US"/>
-    <meta property="og:image" content="https://.../og-image.jpg"/>
+    <meta property="og:image" content="https://oleksiy-nesterov.github.io/test-tubes/og-image.jpg"/>
     <meta property="og:image:width" content="1200"/>
     <meta property="og:image:height" content="630"/>
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:title" content="Test Tubes Puzzle"/>
-    <meta name="twitter:description" content="Pure JS Edition A classic liquid sorting puzzle built with zero dependencies. This project demonstrates the power of Vanilla JavaScript and CSS Flexbox/Transitions to create smooth, interactive gameplay and logic without the overhead of frameworks. Simple, fast, and lightweight." />
-    <meta name="twitter:image" content="https://.../og-image.jpg"/>
+    <meta name="twitter:description"
+          content="Pure JS Edition A classic liquid sorting puzzle built with zero dependencies. This project demonstrates the power of Vanilla JavaScript and CSS Flexbox/Transitions to create smooth, interactive gameplay and logic without the overhead of frameworks. Simple, fast, and lightweight."/>
+    <meta name="twitter:image" content="https://oleksiy-nesterov.github.io/test-tubes/og-image.jpg"/>
 
     <title>Test Tubes Puzzle</title>
+
+    <style>
+      html {
+        height: 100%;
+      }
+
+      body {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        flex-direction: row;
+        gap: 40px;
+        background-color: black;
+      }
+
+      /* tube */
+      .tube {
+        --c1: transparent;
+        --c2: transparent;
+        --c3: transparent;
+        --c4: transparent;
+        --f: 0;
+
+        --glass-rgb: 200, 200, 255;
+        --duration: 1s;
+        --top: 20px;
+        --width: 60px;
+        --height: 200px;
+        --border: calc(var(--width) / 30);
+        width: var(--width);
+        height: var(--height);
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+      }
+
+      .tube > div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        border: var(--border) solid rgba(var(--glass-rgb), 0.8);
+        border-top-width: calc(var(--border) * 0.5);
+        border-bottom-left-radius: calc(var(--width) / 4);
+        border-bottom-right-radius: calc(var(--width) / 4);
+      }
+
+      .tube > div:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        bottom: 0;
+        background: linear-gradient(
+            to right,
+            rgba(var(--glass-rgb), 0.1),
+            rgba(var(--glass-rgb), 0.4) 5%,
+            rgba(var(--glass-rgb), 0.15) 30%,
+            rgba(var(--glass-rgb), 0) 30%,
+            rgba(var(--glass-rgb), 0)
+        ),
+        linear-gradient(
+            to top,
+            rgba(var(--glass-rgb), 0.8),
+            rgba(var(--glass-rgb), 0.5) var(--border),
+            rgba(var(--glass-rgb), 0) calc(var(--border) * 2),
+            rgba(var(--glass-rgb), 0)
+        );
+      }
+
+      .tube > div:before {
+        content: "";
+        position: absolute;
+        top: var(--top);
+        left: 0;
+        width: 100%;
+        bottom: 0;
+        transition: clip-path calc(var(--duration) * 1.1) ease;
+        transform-origin: 0 0;
+        background: linear-gradient(
+            to bottom,
+            var(--c1) 0%,
+            var(--c1) 25%,
+            var(--c2) 25%,
+            var(--c2) 50%,
+            var(--c3) 50%,
+            var(--c3) 75%,
+            var(--c4) 75%,
+            var(--c4) 100%
+        );
+        --shadow: calc(var(--height) - var(--top) - var(--border) * 2);
+        box-shadow: 0 var(--shadow) 0 0 var(--c4);
+        clip-path: polygon(
+            0 calc(100% * (1 - var(--f))),
+            100% calc(100% * (1 - var(--f))),
+            100% 200%,
+            0 200%
+        );
+      }
+
+      .tube.pour {
+        animation-duration: var(--duration);
+        animation-timing-function: ease-in-out;
+      }
+
+      .tube.pour > div {
+        transform-origin: 0 0;
+        transform: rotate(calc(-90deg * var(--v0)));
+      }
+
+      .tube.pour:before {
+        --drop-width: calc(var(--width) / 20);
+        content: "";
+        position: absolute;
+        height: calc(100% * var(--v0));
+        bottom: calc(100% * (1 - var(--v1)));
+        left: 0;
+        width: var(--drop-width);
+        border-radius: calc(var(--drop-width) * 0.5);
+        transform-origin: 50% 0;
+        background: linear-gradient(
+            to right,
+            var(--c1) 0%,
+            var(--c1) 25%,
+            var(--c2) 25%,
+            var(--c2) 50%,
+            var(--c3) 50%,
+            var(--c3) 75%,
+            var(--c4) 75%,
+            var(--c4) 100%
+        );
+        background-repeat: no-repeat;
+        background-size: calc(var(--drop-width) * 4) 100%;
+        background-position: calc(var(--drop-width) * ((0.75 - var(--f)) * -4)) 0;
+      }
+
+      .tube.pour > div:before {
+        width: calc(var(--height) * 2);
+        transform-origin: 0 calc(100% * (0.75 - var(--f)));
+        transform: translateY(
+            calc((-100% * (1.25 - var(--f)) - var(--top)) * var(--v0))
+        ) rotate(calc(75deg * var(--v0)));
+      }
+
+      /* interpolation */
+      @property --v0 {
+        syntax: "<number>";
+        inherits: true;
+        initial-value: 0;
+      }
+
+      @property --v1 {
+        syntax: "<number>";
+        inherits: true;
+        initial-value: -1;
+      }
+
+      @keyframes interpolation {
+        0% {
+          --v0: 0;
+          --v1: 0;
+        }
+        50% {
+          --v0: 1;
+          --v1: 1;
+        }
+        100% {
+          --v0: 0;
+          --v1: 1;
+        }
+      }
+
+      /* experiment */
+      body > div {
+        min-width: 60px;
+      }
+      .selected {
+        --glass-rgb: 255, 255, 255;
+        transform: scale(1.1);
+      }
+      .tube.pour {
+        position: absolute;
+        z-index: 1;
+        left: var(--x);
+        top: var(--y);
+        transform: translate(50%, -25%);
+      }
+    </style>
 </head>
 <body>
+<div>
+    <div class="tube">
+        <div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="tube">
+        <div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="tube" style="--c1:#0079FF; --c2:#F6FA70; --c3:#00DFA2; --c4:#FF0060; --f:1">
+        <div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="tube" style="--c1:#0079FF; --c2:#00DFA2; --c3:#F6FA70; --c4:#FF0060; --f:1">
+        <div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="tube" style="--c1:#FF0060; --c2:#00DFA2; --c3:#00DFA2; --c4:#FF0060; --f:1">
+        <div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="tube" style="--c1:#0079FF; --c2:#0079FF; --c3:#F6FA70; --c4:#F6FA70; --f:1">
+        <div>
+        </div>
+    </div>
+</div>
 </body>
+<script>
+    const map0 = {1: '--c1', 0.75: '--c2', 0.5: '--c3', 0.25: '--c4'};
+    const map1 = {0: '--c4', 0.25: '--c3', 0.5: '--c2', 0.75: '--c1'};
+    const map2 = {0.25: '--c4', 0.5: '--c3', 0.75: '--c2'};
+
+    let selected = null;
+    document.querySelectorAll('.tube').forEach((tube, i) => {
+        tube.addEventListener('animationend', (e) => {
+            if (e.animationName !== 'interpolation') return;
+            tube.classList.remove('pour');
+            if (selected) {
+                selected.classList.remove('selected');
+                selected = null;
+            }
+        });
+
+        tube.onclick = () => {
+            if (selected === tube) {
+                selected.classList.remove('selected');
+                selected = null;
+                return;
+            }
+
+            const f = parseFloat(tube.style.getPropertyValue('--f') || 0);
+            if (!selected) {
+                if (f > 0) {
+                    selected = tube;
+                    selected.classList.add('selected');
+                }
+                return;
+            }
+
+            const fs = parseFloat(selected.style.getPropertyValue('--f') || 0);
+            if (f === 1 || fs === 0) {
+                return;
+            }
+
+            let i = 1;
+            const d = 0.25;
+            const c = selected.style.getPropertyValue(map0[fs]) || 'transparent';
+            while (d * i < 1 && c === selected.style.getPropertyValue(map0[fs - d * i])) {
+                i++;
+            }
+            if ((f !== 0 && c !== tube.style.getPropertyValue(map2[f])) || f + d * i > 1) {
+                return;
+            }
+
+            const r = tube.getBoundingClientRect();
+            selected.style.setProperty('--x', `${r.left}px`);
+            selected.style.setProperty('--y', `${r.top}px`);
+            selected.style.setProperty('--f', fs - d * i);
+            selected.classList.add('pour');
+            selected.style.animationName = 'none';
+            requestAnimationFrame(() => {
+                selected.style.animationName = 'interpolation';
+                if (fs - d * i === 0) {
+                    selected.classList.remove('selected');
+                    selected = null;
+                }
+            });
+            for (let n = 0; n < i; n++) {
+                tube.style.setProperty(map1[f + d * n], c);
+            }
+            tube.style.setProperty('--f', f + d * i);
+        };
+    });
+</script>
 </html>
