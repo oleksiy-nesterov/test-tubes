@@ -18,3 +18,5 @@ https://oleksiy-nesterov.github.io/test-tubes/
 2.  Tap another tube to pour the color.
 3.  **Rule:** You can only pour onto the same color or into an empty tube.
 4.  **Goal:** Fill each tube with a single, solid color to win.
+
+[![Hits](https://hits.sh/github.com/oleksiy-nesterov/test-tubes.svg?label=views&color=FF0060&labelColor=151515)](https://hits.sh/github.com/oleksiy-nesterov/test-tubes/)

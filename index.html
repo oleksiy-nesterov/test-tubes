@@ -250,7 +250,7 @@
       margin: 80px 0;
     }
 
-    body > span {
+    body > a {
       position: absolute;
       right: 20px;
       top: 20px;
@@ -258,9 +258,18 @@
       font-family: sans-serif;
       cursor: pointer;
     }
+    body > a:hover {
+      color: #FF0060;
+    }
+    body > a:before {
+      content: "reset level";
+    }
 
-    body > span:before {
-      content: "Reset Level";
+    body > img {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      pointer-events: none;
     }
 
     .selected {
@@ -422,9 +431,14 @@
     lock = false;
     selectedTube = null;
     document.body.innerHTML = '';
-    const reset = document.createElement('span');
+
+    const reset = document.createElement('a');
     reset.onclick = () => createGame(levels);
-    document.body.append(...levels.map((level) => createLevel(...level)).flat(), reset)
+
+    const views = document.createElement('img');
+    views.src = 'https://hits.sh/oleksiy-nesterov.github.io/test-tubes.svg?label=plays&color=FF0060&labelColor=151515';
+
+    document.body.append(...levels.map((level) => createLevel(...level)).flat(), reset, views)
   }
 
   createGame([[4, 1], [4, 1, PALETTE.slice(-4)]]);
