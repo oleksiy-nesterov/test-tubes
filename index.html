@@ -136,7 +136,13 @@
       z-index: 1;
     }
 
+    .tube.selected {
+      --glass-rgb: 255, 255, 255;
+      scale: 1.1;
+    }
+
     .tube.pour {
+      scale: 1;
       transform: translate(calc(var(--x) + 50%), calc(var(--y) - 20%));
       animation-duration: var(--duration);
       animation-timing-function: ease-in-out;
@@ -229,16 +235,18 @@
     }
 
     /* experiment */
-    html {
+    html, body {
       min-height: 100svh;
+      width: 100svw;
       display: flex;
+      position: relative;
       flex-direction: row;
       justify-content: center;
       align-items: center;
       background-color: black;
+      margin: 0;
     }
-
-    body {
+    section {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -246,39 +254,59 @@
       flex-direction: row;
       gap: 40px;
       flex-wrap: wrap;
-      background-color: black;
-      margin: 80px 0;
+      padding: 80px 0;
     }
-
-    body > a {
-      position: absolute;
-      right: 20px;
-      top: 20px;
+    a {
       color: white;
       font-family: sans-serif;
+      font-size: 14px;
       cursor: pointer;
-    }
-    body > a:hover {
-      color: #FF0060;
-    }
-    body > a:before {
-      content: "reset level";
+      text-decoration: none;
+      &:hover {
+        color: #FF0060;
+      }
     }
 
-    body > img {
+    .repo {
       position: absolute;
       left: 20px;
       top: 20px;
-      pointer-events: none;
     }
-
-    .selected {
-      --glass-rgb: 255, 255, 255;
-      transform: scale(1.1);
+    .reset {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      &:before {
+        content: "reset level";
+      }
+    }
+    .add {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+    }
+    .views {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
+  <section></section>
+  <a class="repo" href="https://github.com/oleksiy-nesterov/test-tubes" target="_blank" title="View source on GitHub" aria-label="View source on GitHub">
+    <img src="https://img.shields.io/badge/github-test--tubes-FF0060?logo=github&labelColor=151515" alt="https://github.com/oleksiy-nesterov/test-tubes"/>
+  </a>
+  <a
+   class="add"
+   href="javascript:void(0)"
+   title="Add to Home Screen"
+   aria-label="Add to Home Screen"
+   onclick="alert('Add this app to your Home Screen for quick access.\nOpen your browser menu or share options and select «Add to Home Screen».')"
+  >
+    install app
+  </a>
 </body>
 <script>
   const CAPACITY = 4;
@@ -430,15 +458,18 @@
   createGame = (levels) => {
     lock = false;
     selectedTube = null;
-    document.body.innerHTML = '';
+    const holder = document.body.querySelector('section');
+    holder.innerHTML = '';
 
     const reset = document.createElement('a');
+    reset.className = 'reset';
     reset.onclick = () => createGame(levels);
 
     const views = document.createElement('img');
+    views.className = 'views';
     views.src = 'https://hits.sh/oleksiy-nesterov.github.io/test-tubes.svg?label=plays&color=FF0060&labelColor=151515';
 
-    document.body.append(...levels.map((level) => createLevel(...level)).flat(), reset, views)
+    holder.append(...levels.map((level) => createLevel(...level)).flat(), reset, views)
   }
 
   createGame([[4, 1], [4, 1, PALETTE.slice(-4)]]);
