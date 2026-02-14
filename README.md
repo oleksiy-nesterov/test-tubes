@@ -7,6 +7,9 @@
 A lightweight, logic-based puzzle game where the goal is to sort colored liquids into their respective test tubes.
 Built entirely with **Pure JavaScript** and **CSS**, demonstrating high performance and zero-dependency architecture.
 
+<p align="center">
+  <img width="640" src="test-tubes.webp" alt="" />
+</p>
 Play here: https://oleksiy-nesterov.github.io/test-tubes/
 
 ## Technical Highlights

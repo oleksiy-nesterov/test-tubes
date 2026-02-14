@@ -50,7 +50,6 @@
       --ff: 0;
       --x: 0;
       --y: 0;
-      --glass-rgb: 200, 200, 255;
       --duration: 1s;
       --top: 20px;
       --width: 60px;
@@ -63,159 +62,210 @@
       cursor: pointer;
       transition: transform 0.2s ease-in-out;
       transform: translate(0, 0);
-    }
 
-    .tube > div {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      overflow: hidden;
-      border: var(--border) solid rgba(var(--glass-rgb), 0.8);
-      border-top-width: calc(var(--border) * 0.5);
-      border-bottom-left-radius: calc(var(--width) / 4);
-      border-bottom-right-radius: calc(var(--width) / 4);
-    }
-
-    .tube > div:after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      bottom: 0;
-      background: linear-gradient(
-          to right,
-          rgba(var(--glass-rgb), 0.1),
-          rgba(var(--glass-rgb), 0.4) 5%,
-          rgba(var(--glass-rgb), 0.15) 30%,
-          rgba(var(--glass-rgb), 0) 30%,
-          rgba(var(--glass-rgb), 0)
-      ),
-      linear-gradient(
-          to top,
-          rgba(var(--glass-rgb), 0.8),
-          rgba(var(--glass-rgb), 0.5) var(--border),
-          rgba(var(--glass-rgb), 0) calc(var(--border) * 2),
-          rgba(var(--glass-rgb), 0)
-      );
-    }
-
-    .tube > div:before {
-      content: "";
-      position: absolute;
-      top: var(--top);
-      left: 0;
-      width: 100%;
-      bottom: 0;
-      transition: clip-path calc(var(--duration) * 1.1) ease;
-      transform-origin: 0 0;
-      background: linear-gradient(
-          to bottom,
-          var(--c1) 0%,
-          var(--c1) 25%,
-          var(--c2) 25%,
-          var(--c2) 50%,
-          var(--c3) 50%,
-          var(--c3) 75%,
-          var(--c4) 75%,
-          var(--c4) 100%
-      );
-      --shadow: calc(var(--height) - var(--top) - var(--border) * 2);
-      box-shadow: 0 var(--shadow) 0 0 var(--c4);
-      clip-path: polygon(
-          0 calc(100% * (1 - var(--f))),
-          100% calc(100% * (1 - var(--f))),
-          100% 200%,
-          0 200%
-      );
-    }
-
-    .tube.top {
-      z-index: 1;
-    }
-
-    .tube.selected {
-      --glass-rgb: 255, 255, 255;
-      scale: 1.1;
-    }
-
-    .tube.pour {
-      scale: 1;
-      transform: translate(calc(var(--x) + 50%), calc(var(--y) - 20%));
-      animation-duration: var(--duration);
-      animation-timing-function: ease-in-out;
-    }
-
-    .tube.pour > div {
-      transform-origin: 0 0;
-      transform: rotate(calc(-90deg * var(--v0)));
-    }
-
-    .tube.pour:before {
-      --drop-width: calc(var(--width) / 20);
-      --fill-delta: calc(75% * var(--ff));
-      content: "";
-      position: absolute;
-      height: calc((100% - var(--fill-delta)) * var(--v0));
-      bottom: calc(var(--fill-delta) + (100% - var(--fill-delta)) * (1 - var(--v1)));
-      left: 0;
-      width: var(--drop-width);
-      border-radius: calc(var(--drop-width) * 0.5);
-      transform-origin: 50% 0;
-      background: linear-gradient(
-          to right,
-          var(--c1) 0%,
-          var(--c1) 25%,
-          var(--c2) 25%,
-          var(--c2) 50%,
-          var(--c3) 50%,
-          var(--c3) 75%,
-          var(--c4) 75%,
-          var(--c4) 100%
-      );
-      background-repeat: no-repeat;
-      background-size: calc(var(--drop-width) * 4) 100%;
-      background-position: calc(var(--drop-width) * ((0.75 - var(--f)) * -4)) 0;
-    }
-
-    .tube.pour > div:before {
-      width: calc(var(--height) * 2);
-      transform-origin: 0 calc(100% * (0.75 - var(--f)));
-      transform: translateY(
-          calc((-100% * (1.25 - var(--f)) - var(--top)) * var(--v0))
-      ) rotate(calc(75deg * var(--v0)));
-    }
-
-    /* interpolation */
-    @property --v0 {
-      syntax: "<number>";
-      inherits: true;
-      initial-value: 0;
-    }
-
-    @property --v1 {
-      syntax: "<number>";
-      inherits: true;
-      initial-value: -1;
-    }
-
-    @keyframes interpolation {
-      0% {
-        --v0: 0;
-        --v1: 0;
+      /* glass */
+      & > div {
+        --g-c: #C8C8FF;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        border: var(--border) solid rgb(from var(--g-c) r g b / 0.8);
+        border-top-width: calc(var(--border) * 0.5);
+        border-bottom-left-radius: calc(var(--width) / 4);
+        border-bottom-right-radius: calc(var(--width) / 4);
       }
-      50% {
-        --v0: 1;
-        --v1: 1;
+      & > div:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        bottom: 0;
+        background: linear-gradient(
+            to right,
+            rgb(from var(--g-c) r g b / 0.1),
+            rgb(from var(--g-c) r g b / 0.4) 5%,
+            rgb(from var(--g-c) r g b / 0.15) 30%,
+            rgb(from var(--g-c) r g b / 0) 30%,
+            rgb(from var(--g-c) r g b / 0)
+        ),
+        linear-gradient(
+            to top,
+            rgb(from var(--g-c) r g b / 0.8),
+            rgb(from var(--g-c) r g b / 0.5) var(--border),
+            rgb(from var(--g-c) r g b / 0) calc(var(--border) * 2),
+            rgb(from var(--g-c) r g b / 0)
+        );
       }
-      100% {
-        --v0: 0;
-        --v1: 1;
+      &.selected > div {
+        --g-c: #FFFFFF;
+      }
+
+      /* liquid */
+      & > div:before {
+        content: "";
+        position: absolute;
+        top: var(--top);
+        left: 0;
+        width: 100%;
+        bottom: 0;
+        transition: clip-path calc(var(--duration) * 1.1) ease;
+        transform-origin: 0 0;
+        background: linear-gradient(
+            to bottom,
+            var(--c1) 0%,
+            var(--c1) 25%,
+            var(--c2) 25%,
+            var(--c2) 50%,
+            var(--c3) 50%,
+            var(--c3) 75%,
+            var(--c4) 75%,
+            var(--c4) 100%
+        );
+        --shadow: calc(var(--height) - var(--top) - var(--border) * 2);
+        box-shadow: 0 var(--shadow) 0 0 var(--c4);
+        clip-path: polygon(
+            0 calc(100% * (1 - var(--f))),
+            100% calc(100% * (1 - var(--f))),
+            100% 200%,
+            0 200%
+        );
+      }
+
+      &.top {
+        z-index: 1;
+      }
+      &.selected {
+        scale: 1.1;
+      }
+
+      /* explosion */
+      &.done:after,
+      &.done:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        --e-duration: 2s;
+        --e-d1: calc(var(--height) / 2);
+        --e-d2: calc(var(--e-d1) * 0.7);
+        --e-p1: calc(50% - var(--e-d1) * var(--v1));
+        --e-p2: calc(50% + var(--e-d1) * var(--v1));
+        --e-p3: calc(50% - var(--e-d2) * var(--v1));
+        --e-p4: calc(50% + var(--e-d2) * var(--v1));
+        --e-s: calc(var(--height) / 30 * var(--v1));
+        --e-c: rgb(from var(--c1) r g b / calc(clamp(0, 1 - (var(--v1) - 0.5) * 2, 1)));
+        height: var(--height);
+        width: var(--height);
+        animation: interpolation;
+        animation-iteration-count: 1;
+        animation-duration: var(--e-duration);
+        animation-timing-function: cubic-bezier(0.1, 0.9, 0.3, 1);
+        transform: translateX(calc(50% * var(--r, 0) - 50%)) translateY(calc(50% * var(--r, 0) - 70%));
+        background-image: radial-gradient(
+            circle at left var(--e-p2) top 50%,
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        ),
+        radial-gradient(
+            circle at left var(--e-p1) top 50%,
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        ),
+        radial-gradient(
+            circle at left 50% top var(--e-p2),
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        ),
+        radial-gradient(
+            circle at left 50% top var(--e-p1),
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        ),
+        radial-gradient(
+            circle at left var(--e-p4) top var(--e-p4),
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        ),
+        radial-gradient(
+            circle at left var(--e-p3) top var(--e-p3),
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        ),
+        radial-gradient(
+            circle at left var(--e-p3) top var(--e-p4),
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        ),
+        radial-gradient(
+            circle at left var(--e-p4) top var(--e-p3),
+            var(--e-c) 0,
+            var(--e-c) var(--e-s),
+            transparent var(--e-s)
+        );
+      }
+      &.done:before {
+        animation-delay: calc(var(--e-duration) * 0.1);
+        transform: translateX(-50%) translateY(-70%) rotate(22.5deg);
+      }
+
+      /* pour */
+      &.pour {
+        scale: 1;
+        transform: translate(calc(var(--x) + 50%), calc(var(--y) - 20%));
+        animation-duration: var(--duration);
+        animation-timing-function: ease-in-out;
+      }
+      &.pour > div {
+        transform-origin: 0 0;
+        transform: rotate(calc(-90deg * var(--v0)));
+      }
+      &.pour:before {
+        --drop-width: calc(var(--width) / 20);
+        --fill-delta: calc(75% * var(--ff));
+        content: "";
+        position: absolute;
+        height: calc((100% - var(--fill-delta)) * var(--v0));
+        bottom: calc(var(--fill-delta) + (100% - var(--fill-delta)) * (1 - var(--v1)));
+        left: 0;
+        width: var(--drop-width);
+        border-radius: calc(var(--drop-width) * 0.5);
+        transform-origin: 50% 0;
+        background: linear-gradient(
+            to right,
+            var(--c1) 0%,
+            var(--c1) 25%,
+            var(--c2) 25%,
+            var(--c2) 50%,
+            var(--c3) 50%,
+            var(--c3) 75%,
+            var(--c4) 75%,
+            var(--c4) 100%
+        );
+        background-repeat: no-repeat;
+        background-size: calc(var(--drop-width) * 4) 100%;
+        background-position: calc(var(--drop-width) * ((0.75 - var(--f)) * -4)) 0;
+      }
+      &.pour > div:before {
+        width: calc(var(--height) * 2);
+        transform-origin: 0 calc(100% * (0.75 - var(--f)));
+        transform: translateY(
+            calc((-100% * (1.25 - var(--f)) - var(--top)) * var(--v0))
+        ) rotate(calc(75deg * var(--v0)));
       }
     }
 
+    /* animations */
     @keyframes shaking {
       0% {
         transform: rotate(0deg);
@@ -233,8 +283,44 @@
         transform: rotate(0deg);
       }
     }
+    /* interpolation */
+    @property --v0 {
+      syntax: "<number>";
+      inherits: true;
+      initial-value: 0;
+    }
+    @property --v1 {
+      syntax: "<number>";
+      inherits: true;
+      initial-value: 0;
+    }
+    @keyframes interpolation {
+      0% {
+        --v0: 0;
+        --v1: 0;
+        --r: 0;
+      }
+      10%  { --r: 0.10; }
+      20%  { --r: -0.10; }
+      30%  { --r: 0.05; }
+      40%  { --r: -0.05; }
+      50% {
+        --v0: 1;
+        --v1: 1;
+        --r: 0.10;
+      }
+      60%  { --r: 0.10; }
+      70%  { --r: -0.10; }
+      80%  { --r: 0.05; }
+      90%  { --r: -0.05; }
+      100% {
+        --v0: 0;
+        --v1: 1;
+        --r: 0;
+      }
+    }
 
-    /* experiment */
+    /* base */
     html, body {
       min-height: 100svh;
       width: 100svw;
@@ -243,7 +329,7 @@
       flex-direction: row;
       justify-content: center;
       align-items: center;
-      background-color: black;
+      background-color: #000000;
       margin: 0;
     }
     section {
@@ -257,7 +343,7 @@
       padding: 80px 0;
     }
     a {
-      color: white;
+      color: #FFFFFF;
       font-family: sans-serif;
       font-size: 14px;
       cursor: pointer;
@@ -266,7 +352,6 @@
         color: #FF0060;
       }
     }
-
     .repo {
       position: absolute;
       left: 20px;
@@ -420,6 +505,10 @@
         ['--f', fill + DELTA * i],
         ...Array(i).fill(0).map((_, n) => [getColorVarByFill(fill + DELTA * n), selectedTubeColor]),
       ]);
+
+      if (isDone(el)) {
+        el.classList.add('done');
+      }
     };
   }
 
