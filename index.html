@@ -60,7 +60,7 @@
       position: relative;
       display: inline-block;
       cursor: pointer;
-      transition: transform 0.2s ease-in-out;
+      transition: all 0.2s ease-in-out;
       transform: translate(0, 0);
 
       /* glass */
@@ -94,8 +94,8 @@
         ),
         linear-gradient(
             to top,
-            rgb(from var(--g-c) r g b / 0.8),
-            rgb(from var(--g-c) r g b / 0.5) var(--border),
+            rgb(from var(--g-c) r g b / 0.5),
+            rgb(from var(--g-c) r g b / 0.3) var(--border),
             rgb(from var(--g-c) r g b / 0) calc(var(--border) * 2),
             rgb(from var(--g-c) r g b / 0)
         );
@@ -146,6 +146,7 @@
       &.done:after,
       &.done:before {
         content: "";
+        pointer-events: none;
         position: absolute;
         left: 50%;
         top: 0;
